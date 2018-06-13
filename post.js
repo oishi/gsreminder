@@ -1,10 +1,10 @@
 // slackにメッセージを投げる
-function postMessageToSlack(message) {
+function postMessageToSlack(channel, message) {
   var options = {
     'method' : 'post',
     'payload' : 'payload={"text": "' + message + '"}'
   };
-  var response = UrlFetchApp.fetch(SLACK_WEBHOOK_URL, options);
+  var response = UrlFetchApp.fetch(channel, options);
 }
 
 
@@ -18,16 +18,12 @@ function post() {
   var vals = sht.getRange(ROW_START, 1, sht.getLastRow(), sht.getLastColumn()).getValues();
   for (var r = 0; r < vals.length-1; r++) {
     var row = vals[r];
-//    Logger.log(row);
     var date = new Date(row[COL_DATE-1]);
     var now = new Date();
 
-//    Logger.log(date < now);
     if(date < now) {
-//      Logger.log(row[COL_SENT - 1]);
-//      Logger.log(typeof(row[COL_SENT - 1]));
       if(row[COL_SENT - 1] == "") {
-        postMessageToSlack(row[COL_MESSAGE-1]);
+        postMessageToSlack(SLACK_WEBHOOK_URL_REMINDER, row[COL_MESSAGE-1]);
         var status = sht.getRange(ROW_START + r, COL_SENT);
         status.setValue(now);
       }
@@ -40,7 +36,7 @@ function post() {
  * 死活確認の意味で定時の自動投稿。使用する時は、トリガーを設定
  */
 function hello() {
-  postMessageToSlack("おはようございます！");
+  postMessageToSlack(SLACK_WEBHOOK_URL_HELLO, "リマインダー稼働中です");
 }
 
 
